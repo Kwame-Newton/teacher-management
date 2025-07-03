@@ -1,0 +1,38 @@
+CREATE TABLE messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT NOT NULL,
+    receiver_id INT DEFAULT NULL,
+    receiver_group VARCHAR(50) DEFAULT NULL, -- e.g. all_teachers, all_parents
+    message TEXT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_emergency BOOLEAN DEFAULT 0,
+    FOREIGN KEY (sender_id) REFERENCES users(id),
+    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Enhanced Attendance table for teachers (with check-in/out)
+CREATE TABLE attendance (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    teacher_id INT NOT NULL,
+    date DATE NOT NULL,
+    check_in TIME DEFAULT NULL,
+    check_out TIME DEFAULT NULL,
+    status ENUM('Present', 'Absent') NOT NULL,
+    note VARCHAR(255),
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_attendance (teacher_id, date),
+    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Leave Requests table
+CREATE TABLE leave_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    teacher_id INT NOT NULL,
+    reason VARCHAR(255) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status ENUM('Pending', 'Approved', 'Denied') DEFAULT 'Pending',
+    supervisor_message VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE
+);
